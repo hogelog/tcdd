@@ -1,12 +1,13 @@
 tcdd
 ====
 
-Tiny cdd is useful cd command under GNU Screen.
-This script inspired by
+Tiny cdd is useful cd command under GNU Screen environment.
+This shell script inspired by
 [cdd (useful zsh script)](http://svn.coderepos.org/share/lang/zsh/cdd/cdd)
 
 
 # Require
+- bash or zsh
 - Perl
 - Ruby
 
