@@ -14,7 +14,7 @@ This shell script inspired by
 # Install
     $ cd
     $ git clone git://github.com/hogelog/tcdd.git .cdd
-    $ echo '. $HOME/.cdd/cdd' >> .bashrc
+    $ echo '. $HOME/.cdd/cdd.sh' >> .bashrc
 
 # Usage
 ## Mutual Window Change Directory

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 cdddir=$HOME/.cdd
 cddfile=$cdddir/cddfile
