@@ -1,37 +1,33 @@
-tcdd
-====
+# cdd-tmux-bash
 
-Tiny cdd is useful cd command under GNU Screen environment.
-This shell script inspired by
-[cdd (useful zsh script)](http://svn.coderepos.org/share/lang/zsh/cdd/cdd)
+cdd-tmux-bash is useful cd command under tmux environment. This shell script inspired by [cdd (useful zsh script)](https://secon.dev/entry/20080218/1203303528/).
 
 
-# Require
+## Require
 - bash or zsh
-- Perl
-- Ruby
+- sed, grep, sort
 
-# Install
-    $ cd
-    $ git clone git://github.com/hogelog/tcdd.git .cdd
-    $ echo '. $HOME/.cdd/cdd.sh' >> .bashrc
+## Install
+```console
+$ git clone git://github.com/hogelog/cdd-tmux-bash.git
+$ echo 'source path/to/cdd-tmux-bash/cdd' >> .bashrc
+```
 
-# Usage
-## Mutual Window Change Directory
-    $ screen
-    [0] $ cd /etc
-    [1] $ cdd 0 # -> /etc
-    [2] $ cd /usr/bin
-## Show Current Directories
-    [2] $ cdd
-            0  /etc
-            1  /etc
-            2  /usr/bin
-**[n] $** means **GNU Screen n-th WINDOW**
+## Usage
+### List directories
+```console
+$ cdd
+0:/home/hogelog/repos/hogelog/tcdd
+1:/home/hogelog/repos/hogelog/tcdd
+2:/usr/local/etc
+3:/
+```
 
-# Todo
-- remove ruby requirement (some environment have no ruby environment)
+### Change directory
+```console
+$ cdd 1
+cd /home/hogelog/repos/hogelog/tcdd
+```
 
-# Issues
-- tcdd override **cd** command, so it cannot install with any other
-tools that overrides cd (like a RVM)
+# Known ssues
+- tcdd override **cd** command, so it cannot install with any other tools that overrides cd (like a RVM)

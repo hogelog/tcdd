@@ -1,0 +1,42 @@
+#!/bin/bash
+
+cddfile=~/.cdd
+cddtmp=~/.cdd.tmp
+current_window=$(tmux list-windows | egrep ': (ba|z)sh\*' | egrep -o '^[0-9]+')
+
+touch $cddfile
+
+function cdd_cd() {
+  IFS=$'\n' windows=( $(cat $cddfile) )
+  target="$1"
+  for window in "${windows[@]}"
+  do
+    if echo "$window" | egrep -q "^$target:"; then
+      dir=$(echo "$window" | sed "s/$target://")
+      break
+    fi
+  done
+  echo "cd $dir"
+  cd $dir
+}
+
+function cdd() {
+  if [ "$1" ]; then
+    cdd_cd "$1"
+  else
+    cat $cddfile
+  fi
+}
+
+function cdd_rec() {
+  newline="${current_window}:$1"
+  sed "s|$current_window:.*|$newline|" $cddfile > $cddtmp
+  grep -q "$newline" $cddtmp || echo "$newline" >> $cddtmp
+  sort $cddtmp > $cddfile
+  rm $cddtmp
+}
+
+function cd() {
+  builtin cd $@
+  cdd_rec $(pwd)
+}
