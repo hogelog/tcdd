@@ -1,6 +1,6 @@
-# cdd-tmux-bash
+# tcdd
 
-cdd-tmux-bash is useful cd command under tmux environment. This shell script inspired by [cdd (useful zsh script)](https://secon.dev/entry/20080218/1203303528/).
+tcdd is useful cd command under tmux environment. This shell script inspired by [cdd (useful zsh script)](https://secon.dev/entry/20080218/1203303528/).
 
 
 ## Require
@@ -9,8 +9,8 @@ cdd-tmux-bash is useful cd command under tmux environment. This shell script ins
 
 ## Install
 ```console
-$ git clone git://github.com/hogelog/cdd-tmux-bash.git
-$ echo 'source path/to/cdd-tmux-bash/cdd' >> .bashrc
+$ git clone git://github.com/hogelog/tcddbash.git
+$ echo 'source path/to/tcdd/cdd' >> .bashrc
 ```
 
 ## Usage
