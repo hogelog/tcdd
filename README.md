@@ -29,5 +29,5 @@ $ cdd 1
 cd /home/hogelog/repos/hogelog/tcdd
 ```
 
-# Known ssues
+# Known issues
 - tcdd override **cd** command, so it cannot install with any other tools that overrides cd (like a RVM)
