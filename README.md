@@ -14,20 +14,9 @@ $ echo 'source path/to/tcdd/cdd' >> .bashrc
 ```
 
 ## Usage
-### List directories
-```console
-$ cdd
-0:/home/hogelog/repos/hogelog/tcdd
-1:/home/hogelog/repos/hogelog/tcdd
-2:/usr/local/etc
-3:/
-```
-
-### Change directory
-```console
-$ cdd 1
-cd /home/hogelog/repos/hogelog/tcdd
-```
+- `cdd` or `cdd list`: Show list
+- `cdd <name>`: Change to named directory
+- `cdd add <name>`: Add name
 
 # Known issues
 - tcdd override **cd** command, so it cannot install with any other tools that overrides cd (like a RVM)

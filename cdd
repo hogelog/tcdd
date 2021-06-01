@@ -7,8 +7,9 @@ current_window=$(tmux list-windows | egrep ': (ba|z)sh\*' | egrep -o '^[0-9]+')
 touch $cddfile
 
 function cdd_cd() {
-  IFS=$'\n' windows=( $(cat $cddfile) )
-  target="$1"
+  IFS=$'\n' local windows=( $(cat $cddfile) )
+  local target="$1"
+  local window
   for window in "${windows[@]}"
   do
     if echo "$window" | egrep -q "^$target:"; then
@@ -20,17 +21,27 @@ function cdd_cd() {
   cd $dir
 }
 
+function cdd_list() {
+  cat $cddfile
+}
+
+function cdd_add() {
+  cdd_rec "$1" "$(pwd)"
+  egrep "^$1:" $cddfile
+}
+
 function cdd() {
-  if [ "$1" ]; then
-    cdd_cd "$1"
-  else
-    cat $cddfile
-  fi
+  case "$1" in
+    "list") cdd_list ;;
+    "") cdd_list ;;
+    "add") cdd_add "$2" ;;
+    *) cdd_cd "$1" ;;
+  esac
 }
 
 function cdd_rec() {
-  newline="${current_window}:$1"
-  sed "s|$current_window:.*|$newline|" $cddfile > $cddtmp
+  local newline="$1:$2"
+  sed "s|$1:.*|$newline|" $cddfile > $cddtmp
   grep -q "$newline" $cddtmp || echo "$newline" >> $cddtmp
   sort $cddtmp > $cddfile
   rm $cddtmp
@@ -38,5 +49,5 @@ function cdd_rec() {
 
 function cd() {
   builtin cd $@
-  cdd_rec $(pwd)
+  cdd_rec "${current_window}" "$(pwd)"
 }
