@@ -41,8 +41,8 @@ function cdd() {
 
 function cdd_rec() {
   local newline="$1:$2"
-  sed "s|$1:.*|$newline|" $cddfile > $cddtmp
-  grep -q "$newline" $cddtmp || echo "$newline" >> $cddtmp
+  sed "s|^$1:.*|$newline|" $cddfile > $cddtmp
+  egrep -q "^$newline" $cddtmp || echo "$newline" >> $cddtmp
   sort $cddtmp > $cddfile
   rm $cddtmp
 }
