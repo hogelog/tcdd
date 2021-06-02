@@ -51,3 +51,21 @@ function cd() {
   builtin cd $@
   cdd_rec "${current_window}" "$(pwd)"
 }
+
+function _cdd_bash() {
+  local cur prev words cword split
+  _init_completion -s || return
+
+  case $cword in
+    1)
+      COMPREPLY=( $(compgen -W "$(echo add && echo list && cat $cddfile | egrep -o '^[^:]+')" -- "$cur") )
+      ;;
+  esac
+}
+
+if type complete >/dev/null; then
+   complete -F _cdd_bash cdd
+else
+  # zsh completion is not implemented
+  :
+fi
