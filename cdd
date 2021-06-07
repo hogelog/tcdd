@@ -52,9 +52,20 @@ function cd() {
   cdd_rec "${current_window}" "$(pwd)"
 }
 
+__cdd_init_completion()
+{
+  COMPREPLY=()
+  _get_comp_words_by_ref cur prev words cword
+}
+
 function _cdd_bash() {
   local cur prev words cword split
-  _init_completion -s || return
+
+  if declare -F _init_completion >/dev/null 2>&1; then
+    _init_completion
+  else
+    __cdd_init_completion
+  fi
 
   case $cword in
     1)
