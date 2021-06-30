@@ -9,7 +9,7 @@ tcdd is useful cd command under tmux environment. This shell script inspired by 
 
 ## Install
 ```console
-$ git clone git://github.com/hogelog/tcddbash.git
+$ git clone git://github.com/hogelog/tcdd.git
 $ echo 'source path/to/tcdd/cdd' >> .bashrc
 ```
 
