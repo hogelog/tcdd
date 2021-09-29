@@ -50,7 +50,7 @@ function cdd_rec() {
 }
 
 function cd() {
-  builtin cd $@
+  builtin cd "$@"
   if [ "x${current_window}" != "x" ]; then
     cdd_rec "${current_window}" "$(pwd)"
   fi
