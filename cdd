@@ -2,7 +2,9 @@
 
 cddfile=~/.cdd
 cddtmp=~/.cdd.tmp
-current_window=$(tmux list-windows | egrep ': (ba|z)sh\*' | egrep -o '^[0-9]+')
+if tmux list-windows >/dev/null 2>&1; then
+  current_window=$(tmux list-windows | egrep '^[0-9]+: .+\*' | egrep -o '^[0-9]+')
+fi
 
 touch $cddfile
 
@@ -49,7 +51,9 @@ function cdd_rec() {
 
 function cd() {
   builtin cd $@
-  cdd_rec "${current_window}" "$(pwd)"
+  if [ "x${current_window}" != "x" ]; then
+    cdd_rec "${current_window}" "$(pwd)"
+  fi
 }
 
 __cdd_init_completion()
