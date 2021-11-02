@@ -7,11 +7,18 @@ tcdd is useful cd command under tmux environment. This shell script inspired by 
 - bash or zsh
 - sed, grep, sort
 
-## Install
+## Installation
+### Manually
 ```console
 $ git clone git://github.com/hogelog/tcdd.git
 $ cp tcdd/tcdd some/bin/
-$ echo 'eval $(tcdd init)' >> .bash_profile
+$ echo 'eval $(tcdd init)' >> ~/.bash_profile
+```
+
+### Homebrew
+```console
+$ brew install hogelog/tap/tcdd
+$ echo 'eval $(tcdd init)' >> ~/.bash_profile
 ```
 
 ## Usage
