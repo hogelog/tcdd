@@ -4,7 +4,7 @@ tcdd is useful cd command under tmux environment. This shell script inspired by 
 
 
 ## Require
-- bash or zsh
+- bash
 - sed, grep, sort
 
 ## Installation
@@ -26,5 +26,6 @@ $ echo 'eval $(tcdd init)' >> ~/.bash_profile
 - `cdd <name>`: Change to named directory
 - `cdd add <name>`: Add name
 
-# Known issues
-- tcdd override **cd** command, so it cannot install with any other tools that overrides cd (like a RVM)
+# Compatibility
+- tcdd now uses PROMPT_COMMAND instead of overriding cd command
+- Compatible with tools that override cd command (mise, direnv, etc.)
