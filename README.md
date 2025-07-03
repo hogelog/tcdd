@@ -4,8 +4,8 @@ tcdd is useful cd command under tmux environment. This shell script inspired by 
 
 
 ## Require
-- bash
-- sed, grep, sort
+- bash (>= 4.0)
+- tmux
 
 ## Installation
 ### Manually

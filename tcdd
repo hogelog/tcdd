@@ -8,7 +8,12 @@ fi
 cddfile=~/.cdd
 cddtmp=~/.cdd.tmp
 if tmux list-windows >/dev/null 2>&1; then
-  current_window=$(tmux list-windows | egrep '^[0-9]+: .+\*' | egrep -o '^[0-9]+')
+  current_window=$(tmux list-windows | while read line; do
+    if [[ "$line" =~ ^([0-9]+):\ .+\* ]]; then
+      echo "${BASH_REMATCH[1]}"
+      break
+    fi
+  done)
 fi
 
 touch $cddfile
@@ -19,8 +24,8 @@ function cdd_cd() {
   local window
   for window in "${windows[@]}"
   do
-    if echo "$window" | egrep -q "^$target:"; then
-      dir=$(echo "$window" | sed "s/$target://")
+    if [[ "$window" =~ ^$target: ]]; then
+      dir="${window#$target:}"
       break
     fi
   done
@@ -34,7 +39,9 @@ function cdd_list() {
 
 function cdd_add() {
   cdd_rec "$1" "$(pwd)"
-  egrep "^$1:" $cddfile
+  while IFS= read -r line; do
+    [[ "$line" =~ ^$1: ]] && echo "$line"
+  done < $cddfile
 }
 
 function cdd() {
@@ -48,9 +55,36 @@ function cdd() {
 
 function cdd_rec() {
   local newline="$1:$2"
-  sed "s|^$1:.*|$newline|" $cddfile > $cddtmp
-  egrep -q "^$newline" $cddtmp || echo "$newline" >> $cddtmp
-  sort $cddtmp > $cddfile
+  local found=0
+  > $cddtmp
+
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^$1: ]]; then
+      echo "$newline" >> $cddtmp
+      found=1
+    else
+      echo "$line" >> $cddtmp
+    fi
+  done < $cddfile
+
+  if [ $found -eq 0 ]; then
+    echo "$newline" >> $cddtmp
+  fi
+
+  # Simple bubble sort for small files
+  mapfile -t lines < $cddtmp
+  local n=${#lines[@]}
+  for ((i=0; i<n-1; i++)); do
+    for ((j=0; j<n-i-1; j++)); do
+      if [[ "${lines[j]}" > "${lines[j+1]}" ]]; then
+        tmp="${lines[j]}"
+        lines[j]="${lines[j+1]}"
+        lines[j+1]="$tmp"
+      fi
+    done
+  done
+
+  printf '%s\n' "${lines[@]}" > $cddfile
   rm $cddtmp
 }
 
@@ -85,7 +119,7 @@ function _cdd_bash() {
 
   case $cword in
     1)
-      COMPREPLY=( $(compgen -W "$(echo add && echo list && cat $cddfile | egrep -o '^[^:]+')" -- "$cur") )
+      COMPREPLY=( $(compgen -W "$(echo add && echo list && while IFS=: read -r key value; do echo "$key"; done < $cddfile)" -- "$cur") )
       ;;
   esac
 }
