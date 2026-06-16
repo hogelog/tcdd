@@ -25,6 +25,7 @@ $ echo 'eval $(tcdd init)' >> ~/.bash_profile
 - `cdd` or `cdd list`: Show list
 - `cdd <name>`: Change to named directory
 - `cdd add <name>`: Add name
+- `cdd add`: Add using the current directory's basename as the name
 
 # Compatibility
 - tcdd now uses PROMPT_COMMAND instead of overriding cd command

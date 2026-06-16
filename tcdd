@@ -38,9 +38,10 @@ function cdd_list() {
 }
 
 function cdd_add() {
-  cdd_rec "$1" "$(pwd)"
+  local name="${1:-$(basename "$(pwd)")}"
+  cdd_rec "$name" "$(pwd)"
   while IFS= read -r line; do
-    [[ "$line" =~ ^$1: ]] && echo "$line"
+    [[ "$line" =~ ^$name: ]] && echo "$line"
   done < $cddfile
 }
 
