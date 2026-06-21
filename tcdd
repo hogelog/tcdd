@@ -19,7 +19,11 @@ fi
 touch $cddfile
 
 function cdd_cd() {
-  IFS=$'\n' local windows=( $(cat $cddfile) )
+  # An `IFS=` prefix on a `local` assignment does not affect the word
+  # splitting of its right-hand side, so the array would split on the
+  # default IFS and break paths/names containing spaces. Read lines verbatim.
+  local windows
+  mapfile -t windows < "$cddfile"
   local target="$1"
   local window
   for window in "${windows[@]}"
