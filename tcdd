@@ -77,8 +77,9 @@ function cdd_rec() {
   fi
 
   # Simple bubble sort for small files
+  local lines n i j tmp
   mapfile -t lines < "$tmpfile"
-  local n=${#lines[@]}
+  n=${#lines[@]}
   for ((i=0; i<n-1; i++)); do
     for ((j=0; j<n-i-1; j++)); do
       if [[ "${lines[j]}" > "${lines[j+1]}" ]]; then
