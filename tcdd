@@ -15,7 +15,7 @@ if tmux list-windows >/dev/null 2>&1; then
   done)
 fi
 
-touch $cddfile
+touch "$cddfile"
 
 function cdd_cd() {
   # An `IFS=` prefix on a `local` assignment does not affect the word
@@ -42,7 +42,7 @@ function cdd_cd() {
 }
 
 function cdd_list() {
-  cat $cddfile
+  cat "$cddfile"
 }
 
 function cdd_add() {
@@ -50,7 +50,7 @@ function cdd_add() {
   cdd_rec "$name" "$(pwd)"
   while IFS= read -r line; do
     [[ "${line%%:*}" == "$name" ]] && echo "$line"
-  done < $cddfile
+  done < "$cddfile"
 }
 
 function cdd() {
@@ -78,7 +78,7 @@ function cdd_rec() {
     else
       echo "$line" >> "$tmpfile"
     fi
-  done < $cddfile
+  done < "$cddfile"
 
   if [ $found -eq 0 ]; then
     echo "$newline" >> "$tmpfile"
@@ -132,7 +132,7 @@ function _cdd_bash() {
 
   case $cword in
     1)
-      COMPREPLY=( $(compgen -W "$(echo add && echo list && while IFS=: read -r key value; do echo "$key"; done < $cddfile)" -- "$cur") )
+      COMPREPLY=( $(compgen -W "$(echo add && echo list && while IFS=: read -r key value; do echo "$key"; done < "$cddfile")" -- "$cur") )
       ;;
   esac
 }
