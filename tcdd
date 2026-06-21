@@ -6,14 +6,6 @@ if [ "$1" == "init" ]; then
 fi
 
 cddfile=~/.cdd
-if tmux list-windows >/dev/null 2>&1; then
-  current_window=$(tmux list-windows | while read line; do
-    if [[ "$line" =~ ^([0-9]+):\ .+\* ]]; then
-      echo "${BASH_REMATCH[1]}"
-      break
-    fi
-  done)
-fi
 
 touch "$cddfile"
 
@@ -104,8 +96,16 @@ function cdd_rec() {
 TCDD_LAST_PWD=""
 
 function tcdd_record_pwd() {
-  if [ "x${current_window}" != "x" ] && [ "$PWD" != "$TCDD_LAST_PWD" ]; then
-    cdd_rec "${current_window}" "$PWD"
+  [ -n "$TMUX" ] || return
+  [ "$PWD" = "$TCDD_LAST_PWD" ] && return
+  # Query this pane's own window index live: a value captured once at
+  # startup went stale after the window was renumbered (renumber-windows,
+  # or closing a lower-numbered window), and reading the globally-active
+  # window would misattribute a prompt firing in a background pane.
+  local current_window
+  current_window=$(tmux display-message -p -t "$TMUX_PANE" '#I' 2>/dev/null)
+  if [ -n "$current_window" ]; then
+    cdd_rec "$current_window" "$PWD"
     TCDD_LAST_PWD="$PWD"
   fi
 }
