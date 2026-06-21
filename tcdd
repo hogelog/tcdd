@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$1" == "init" ]; then
+if [ "${1:-}" == "init" ]; then
   echo "source \"$0\""
   exit
 fi
@@ -46,10 +46,10 @@ function cdd_add() {
 }
 
 function cdd() {
-  case "$1" in
+  case "${1:-}" in
     "list") cdd_list ;;
     "") cdd_list ;;
-    "add") cdd_add "$2" ;;
+    "add") cdd_add "${2:-}" ;;
     *) cdd_cd "$1" ;;
   esac
 }
@@ -97,22 +97,24 @@ function cdd_rec() {
 TCDD_LAST_PWD=""
 
 function tcdd_record_pwd() {
-  [ -n "$TMUX" ] || return
-  [ "$PWD" = "$TCDD_LAST_PWD" ] && return
-  # A value cached at startup goes stale once the window is renumbered
-  # (renumber-windows, or closing a lower-numbered window); targeting this
-  # pane rather than the active window also avoids misattributing a prompt
-  # that fires in a background pane.
-  local current_window
-  current_window=$(tmux display-message -p -t "$TMUX_PANE" '#I' 2>/dev/null)
-  if [ -n "$current_window" ]; then
-    cdd_rec "$current_window" "$PWD"
-    TCDD_LAST_PWD="$PWD"
+  # `if`, not early `return`s: skipping the body must yield 0, or a failed
+  # guard would surface a non-zero status to the next prompt's $?.
+  if [ -n "${TMUX:-}" ] && [ "$PWD" != "$TCDD_LAST_PWD" ]; then
+    # A value cached at startup goes stale once the window is renumbered
+    # (renumber-windows, or closing a lower-numbered window); targeting this
+    # pane rather than the active window also avoids misattributing a prompt
+    # that fires in a background pane.
+    local current_window
+    current_window=$(tmux display-message -p -t "${TMUX_PANE:-}" '#I' 2>/dev/null)
+    if [ -n "$current_window" ]; then
+      cdd_rec "$current_window" "$PWD"
+      TCDD_LAST_PWD="$PWD"
+    fi
   fi
 }
 
 # Use PROMPT_COMMAND to track directory changes
-if [[ ! "$PROMPT_COMMAND" =~ tcdd_record_pwd ]]; then
+if [[ ! "${PROMPT_COMMAND:-}" =~ tcdd_record_pwd ]]; then
   PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND;}tcdd_record_pwd"
 fi
 
