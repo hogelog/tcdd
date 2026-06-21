@@ -29,8 +29,8 @@ function cdd_cd() {
   local dir=""
   for window in "${windows[@]}"
   do
-    if [[ "$window" =~ ^$target: ]]; then
-      dir="${window#$target:}"
+    if [[ "${window%%:*}" == "$target" ]]; then
+      dir="${window#*:}"
       break
     fi
   done
@@ -50,7 +50,7 @@ function cdd_add() {
   local name="${1:-$(basename "$(pwd)")}"
   cdd_rec "$name" "$(pwd)"
   while IFS= read -r line; do
-    [[ "$line" =~ ^$name: ]] && echo "$line"
+    [[ "${line%%:*}" == "$name" ]] && echo "$line"
   done < $cddfile
 }
 
@@ -69,7 +69,7 @@ function cdd_rec() {
   > $cddtmp
 
   while IFS= read -r line; do
-    if [[ "$line" =~ ^$1: ]]; then
+    if [[ "${line%%:*}" == "$1" ]]; then
       echo "$newline" >> $cddtmp
       found=1
     else
