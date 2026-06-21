@@ -12,7 +12,7 @@ touch "$cddfile"
 function cdd_cd() {
   # An `IFS=` prefix on a `local` assignment does not affect the word
   # splitting of its right-hand side, so the array would split on the
-  # default IFS and break paths/names containing spaces. Read lines verbatim.
+  # default IFS and break paths/names containing spaces.
   local windows
   mapfile -t windows < "$cddfile"
   local target="$1"
@@ -58,9 +58,9 @@ function cdd_rec() {
   local newline="$1:$2"
   local found=0
   local tmpfile
-  # A private temp plus an atomic rename keeps ~/.cdd consistent when
-  # several windows record concurrently (PROMPT_COMMAND fires per prompt);
-  # a single shared temp file clobbered itself and tore the output.
+  # PROMPT_COMMAND fires per prompt, so several windows can record
+  # concurrently; an in-place rewrite (or a shared temp file) tears
+  # ~/.cdd under that race.
   tmpfile=$(mktemp "${cddfile}.XXXXXX") || return 1
 
   while IFS= read -r line; do
@@ -99,10 +99,10 @@ TCDD_LAST_PWD=""
 function tcdd_record_pwd() {
   [ -n "$TMUX" ] || return
   [ "$PWD" = "$TCDD_LAST_PWD" ] && return
-  # Query this pane's own window index live: a value captured once at
-  # startup went stale after the window was renumbered (renumber-windows,
-  # or closing a lower-numbered window), and reading the globally-active
-  # window would misattribute a prompt firing in a background pane.
+  # A value cached at startup goes stale once the window is renumbered
+  # (renumber-windows, or closing a lower-numbered window); targeting this
+  # pane rather than the active window also avoids misattributing a prompt
+  # that fires in a background pane.
   local current_window
   current_window=$(tmux display-message -p -t "$TMUX_PANE" '#I' 2>/dev/null)
   if [ -n "$current_window" ]; then
