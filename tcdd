@@ -94,21 +94,27 @@ function cdd_rec() {
   mv -f "$tmpfile" "$cddfile"
 }
 
-TCDD_LAST_PWD=""
-
+# Left unset (not "") so the first prompt is distinguishable from a later cd.
 function tcdd_record_pwd() {
   # `if`, not early `return`s: skipping the body must yield 0, or a failed
   # guard would surface a non-zero status to the next prompt's $?.
-  if [ -n "${TMUX:-}" ] && [ "$PWD" != "$TCDD_LAST_PWD" ]; then
-    # A value cached at startup goes stale once the window is renumbered
-    # (renumber-windows, or closing a lower-numbered window); targeting this
-    # pane rather than the active window also avoids misattributing a prompt
-    # that fires in a background pane.
-    local current_window
-    current_window=$(tmux display-message -p -t "${TMUX_PANE:-}" '#I' 2>/dev/null)
-    if [ -n "$current_window" ]; then
-      cdd_rec "$current_window" "$PWD"
+  if [ -n "${TMUX:-}" ] && [ "$PWD" != "${TCDD_LAST_PWD:-}" ]; then
+    if [ -z "${TCDD_LAST_PWD+set}" ]; then
+      # A new window's first prompt fires while it still sits in its start
+      # dir (often $HOME), which the user never navigated to. Seed the
+      # baseline without recording so only a later cd lands in ~/.cdd.
       TCDD_LAST_PWD="$PWD"
+    else
+      # A value cached at startup goes stale once the window is renumbered
+      # (renumber-windows, or closing a lower-numbered window); targeting this
+      # pane rather than the active window also avoids misattributing a prompt
+      # that fires in a background pane.
+      local current_window
+      current_window=$(tmux display-message -p -t "${TMUX_PANE:-}" '#I' 2>/dev/null)
+      if [ -n "$current_window" ]; then
+        cdd_rec "$current_window" "$PWD"
+        TCDD_LAST_PWD="$PWD"
+      fi
     fi
   fi
 }
