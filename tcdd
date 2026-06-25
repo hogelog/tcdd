@@ -94,26 +94,35 @@ function cdd_rec() {
   mv -f "$tmpfile" "$cddfile"
 }
 
-# Left unset (not "") so the first prompt is distinguishable from a later cd.
+# Unset (not "") so the first prompt is distinguishable from a later cd.
 function tcdd_record_pwd() {
-  # `if`, not early `return`s: skipping the body must yield 0, or a failed
-  # guard would surface a non-zero status to the next prompt's $?.
-  if [ -n "${TMUX:-}" ] && [ "$PWD" != "${TCDD_LAST_PWD:-}" ]; then
+  # `if`, not early `return`: a skipped body must still yield 0 for the next $?.
+  if [ -n "${TMUX:-}" ]; then
     if [ -z "${TCDD_LAST_PWD+set}" ]; then
-      # A new window's first prompt fires while it still sits in its start
-      # dir (often $HOME), which the user never navigated to. Seed the
-      # baseline without recording so only a later cd lands in ~/.cdd.
+      # First prompt = the window's untouched start dir (often $HOME). Seed
+      # without recording; also dodges a stale cd in shared history below.
       TCDD_LAST_PWD="$PWD"
     else
-      # A value cached at startup goes stale once the window is renumbered
-      # (renumber-windows, or closing a lower-numbered window); targeting this
-      # pane rather than the active window also avoids misattributing a prompt
-      # that fires in a background pane.
-      local current_window
-      current_window=$(tmux display-message -p -t "${TMUX_PANE:-}" '#I' 2>/dev/null)
-      if [ -n "$current_window" ]; then
-        cdd_rec "$current_window" "$PWD"
-        TCDD_LAST_PWD="$PWD"
+      local record=""
+      if [ "$PWD" != "$TCDD_LAST_PWD" ]; then
+        record=1
+      else
+        # Also catch an explicit cd that didn't move PWD (argless cd already at
+        # $HOME). HISTTIMEFORMAT= strips a configured timestamp prefix.
+        local hist cmd
+        hist=$(HISTTIMEFORMAT= history 1)
+        read -r _ cmd <<< "$hist"
+        [[ "$cmd" == "cd" || "$cmd" == "cd "* ]] && record=1
+      fi
+      if [ -n "$record" ]; then
+        # Re-resolve each time: a cached index goes stale on renumber, and the
+        # pane (not active window) avoids crediting a background pane's prompt.
+        local current_window
+        current_window=$(tmux display-message -p -t "${TMUX_PANE:-}" '#I' 2>/dev/null)
+        if [ -n "$current_window" ]; then
+          cdd_rec "$current_window" "$PWD"
+          TCDD_LAST_PWD="$PWD"
+        fi
       fi
     fi
   fi
